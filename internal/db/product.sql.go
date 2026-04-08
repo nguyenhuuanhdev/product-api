@@ -123,6 +123,72 @@ func (q *Queries) SearchProducts(ctx context.Context, dollar_1 string) ([]Produc
 	return items, nil
 }
 
+const sortProductsByPriceAsc = `-- name: SortProductsByPriceAsc :many
+SELECT id, name, price, image FROM products
+ORDER BY price ASC
+`
+
+func (q *Queries) SortProductsByPriceAsc(ctx context.Context) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, sortProductsByPriceAsc)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			&i.Image,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sortProductsByPriceDesc = `-- name: SortProductsByPriceDesc :many
+SELECT id, name, price, image FROM products
+ORDER BY price DESC
+`
+
+func (q *Queries) SortProductsByPriceDesc(ctx context.Context) ([]Product, error) {
+	rows, err := q.db.QueryContext(ctx, sortProductsByPriceDesc)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			&i.Image,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateProduct = `-- name: UpdateProduct :one
 UPDATE products
 SET name = $1, price = $2, image = $3

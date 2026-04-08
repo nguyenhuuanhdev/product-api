@@ -21,3 +21,11 @@ DELETE FROM products WHERE id = $1;
 -- name: SearchProducts :many
 SELECT id, name, price, image FROM products
 WHERE LOWER(name) LIKE '%' || $1::text || '%';
+
+-- name: SortProductsByPriceAsc :many
+SELECT * FROM products
+ORDER BY price ASC;
+
+-- name: SortProductsByPriceDesc :many
+SELECT * FROM products
+ORDER BY price DESC;

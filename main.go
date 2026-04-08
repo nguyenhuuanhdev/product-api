@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -161,17 +162,41 @@ func searchProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
-// func main() {
-// 	http.HandleFunc("/products", getProduct)
-// 	http.HandleFunc("/product", createProduct)
-// 	http.HandleFunc("/product/update", updateProduct)
-// 	http.HandleFunc("/product/delete", deleteProduct)
-// 	http.HandleFunc("/product/price", checkPrice)
-// 	http.HandleFunc("/product/search", searchProduct)
+// sap xep san pham theo gia tang dan
+func getProductsPriceAsc(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Sai method", http.StatusMethodNotAllowed)
+		return
+	}
 
-// 	fmt.Println("Server đang chạy ở http://localhost:8080")
-// 	http.ListenAndServe(":8080", nil)
-// }
+	ctx := context.Background()
+	products, err := queries.SortProductsByPriceAsc(ctx)
+	if err != nil {
+		http.Error(w, "DB lỗi", 500)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(products)
+}
+
+// san pham gia giam dan
+func getProductsPriceDesc(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Sai method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ctx := context.Background()
+	products, err := queries.SortProductsByPriceDesc(ctx)
+	if err != nil {
+		http.Error(w, "Lỗi server", 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	json.NewEncoder(w).Encode(products)
+	json.NewEncoder(w).Encode(products)
+}
 
 var queries *db.Queries
 
@@ -191,6 +216,8 @@ func main() {
 	http.HandleFunc("/product/delete", deleteProduct)
 	http.HandleFunc("/product/price", checkPrice)
 	http.HandleFunc("/product/search", searchProduct)
+	http.HandleFunc("/products/price-asc", getProductsPriceAsc)
+	http.HandleFunc("/products/price-desc", getProductsPriceDesc)
 	fmt.Println("Server đang chạy ở http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
