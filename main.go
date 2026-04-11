@@ -208,6 +208,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	
+	if err := conn.Ping(); err != nil {
+		log.Fatal("Kết nối DB thất bại:", err)
+	}
+
+	fmt.Println(" Kết nối DB thành công")
+
 	queries = db.New(conn)
 
 	http.HandleFunc("/products", getProduct)
@@ -218,6 +225,7 @@ func main() {
 	http.HandleFunc("/product/search", searchProduct)
 	http.HandleFunc("/products/price-asc", getProductsPriceAsc)
 	http.HandleFunc("/products/price-desc", getProductsPriceDesc)
+
 	fmt.Println("Server đang chạy ở http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
